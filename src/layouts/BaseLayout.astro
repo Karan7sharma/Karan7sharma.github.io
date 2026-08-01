@@ -15,15 +15,28 @@ const { title = site.seo.title, description = site.seo.description } =
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 
+// url comes from Astro.site (astro.config.mjs), never a second hardcoded
+// value — they drifted apart once already and the schema ended up telling
+// search engines the homepage was a domain that didn't exist.
 const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: site.name,
-  url: site.url,
+  url: Astro.site?.href ?? canonical.origin,
   jobTitle: site.kicker,
   email: `mailto:${site.email}`,
   address: { '@type': 'PostalAddress', addressLocality: site.location },
   sameAs: [site.github, site.linkedin],
+  knowsAbout: [
+    'Cloud infrastructure',
+    'DevOps',
+    'Observability',
+    'AWS',
+    'Grafana',
+    'Prometheus',
+    'Loki',
+    'Docker',
+  ],
 };
 ---
 
@@ -33,7 +46,21 @@ const personSchema = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {/* iOS ignores SVG favicons, so it gets a raster one. */}
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonical} />
+
+    {/* Tints the browser chrome on mobile to match the page. */}
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#0a0f0d"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#f5f9f7"
+    />
 
     <title>{title}</title>
     <meta name="description" content={description} />

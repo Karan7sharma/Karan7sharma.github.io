@@ -6,8 +6,9 @@
 export const site = {
   name: 'Karan Sharma',
   monogram: 'K',
-  domain: 'karan.dev',
-  url: 'https://karan.dev',
+  // The canonical URL lives in astro.config.mjs (`site`) and nowhere else.
+  // Duplicating it here is exactly how the JSON-LD ended up telling search
+  // engines the homepage was karan.dev — a domain that was never bought.
 
   // Nav + hero
   kicker: 'Cloud / DevOps Engineer',
