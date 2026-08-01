@@ -1,0 +1,50 @@
+---
+import { site } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap inner">
+    <span class="meta">© {year} {site.name} · {site.kicker}</span>
+    <span class="meta right">
+      <a href="/#kickups" class="egg" aria-label="Play the game">⚽</a>
+      <span class="sep" aria-hidden="true">·</span>
+      built with astro · <a href="/#top" class="body-link">↑ top</a>
+    </span>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    background: var(--sunk);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding-block: var(--space-l);
+  }
+
+  .right {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .egg {
+    font-size: 1rem;
+    display: inline-block;
+    transition: transform var(--t-fast);
+  }
+  .egg:hover {
+    transform: rotate(-18deg) scale(1.15);
+  }
+
+  .sep {
+    color: var(--line-strong);
+  }
+</style>

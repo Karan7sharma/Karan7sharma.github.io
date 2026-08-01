@@ -1,0 +1,223 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+
+const routes = [
+  { path: '#about', label: 'about' },
+  { path: '#skills', label: 'stack' },
+  { path: '#projects', label: 'projects' },
+  { path: '#experience', label: 'experience' },
+  { path: '#kickups', label: 'play' },
+  { path: '#contact', label: 'contact' },
+];
+---
+
+<BaseLayout
+  title={`404 — not found · ${site.name}`}
+  description="That page doesn't exist."
+>
+  <Nav />
+
+  <main id="main" tabindex="-1" class="shell">
+    <div class="glow-blob blob" aria-hidden="true"></div>
+
+    <div class="wrap inner">
+      <p class="code">404</p>
+
+      <div class="term">
+        <div class="term-bar">
+          <div class="lights" aria-hidden="true">
+            <span style="background:#ff5f57"></span>
+            <span style="background:#febc2e"></span>
+            <span style="background:#28c840"></span>
+          </div>
+          <span class="term-title">bash — not found</span>
+          <span></span>
+        </div>
+
+        <div class="term-body">
+          <p class="line">
+            <span class="arrow">➜</span>
+            <span class="cmd">cd <span data-path>/…</span></span>
+          </p>
+          <p class="line err">
+            bash: cd: <span data-path>/…</span>: No such file or directory
+          </p>
+
+          <p class="line spaced">
+            <span class="arrow">➜</span>
+            <span class="cmd">ls ~</span>
+          </p>
+          <ul class="routes">
+            {
+              routes.map((r) => (
+                <li>
+                  <a href={`/${r.path}`}>{r.label}</a>
+                </li>
+              ))
+            }
+          </ul>
+
+          <p class="line spaced">
+            <span class="arrow">➜</span>
+            <span class="cursor-block cursor"></span>
+          </p>
+        </div>
+      </div>
+
+      <p class="lede">
+        That page doesn't exist — but the ball still does.
+      </p>
+
+      <div class="actions">
+        <a href="/" class="btn btn-primary">Back home</a>
+        <a href="/#kickups" class="btn btn-ghost">Play footy-juggle</a>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .shell {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    align-content: center;
+    min-height: 74svh;
+    padding-block: var(--space-2xl);
+  }
+
+  .blob {
+    top: -6rem;
+    right: -6rem;
+    width: 26rem;
+    height: 26rem;
+    background: radial-gradient(
+      closest-side,
+      rgb(52 211 153 / 0.14),
+      transparent
+    );
+  }
+
+  .inner {
+    position: relative;
+    max-width: 46rem;
+  }
+
+  .code {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 14vw, 7rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    margin-bottom: var(--space-m);
+  }
+
+  /* Terminal keeps its own dark palette in both themes, like the hero one. */
+  .term {
+    background: var(--term-bg);
+    border: 1px solid var(--term-line);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    font-family: var(--font-mono);
+  }
+
+  .term-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--term-line);
+    background: var(--term-raised);
+  }
+  .lights {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .lights span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .term-title {
+    font-size: 0.7rem;
+    color: var(--term-dim);
+  }
+
+  .term-body {
+    padding: 1rem;
+    font-size: 0.78rem;
+    line-height: 1.7;
+  }
+
+  .line {
+    display: flex;
+    gap: 0.55rem;
+    color: var(--term-ink);
+    word-break: break-all;
+  }
+  .line.spaced {
+    margin-top: 0.85rem;
+  }
+  .arrow {
+    color: var(--term-accent);
+    flex: none;
+  }
+  .cmd {
+    color: var(--term-ink);
+  }
+  .err {
+    color: #f87171;
+  }
+
+  .routes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
+    list-style: none;
+    margin: 0.35rem 0 0;
+    padding-left: 1.35rem;
+  }
+  .routes a {
+    color: var(--term-accent);
+    transition: opacity var(--t-fast);
+  }
+  .routes a:hover {
+    opacity: 0.75;
+  }
+
+  .cursor-block {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: var(--term-accent);
+  }
+
+  .lede {
+    margin-top: var(--space-l);
+    color: var(--ink-soft);
+    font-size: var(--step-1);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-m);
+  }
+</style>
+
+<script>
+  // Show the path the visitor actually asked for, so the error reads like a
+  // real shell response rather than a decoration.
+  const path = location.pathname + location.search;
+  document.querySelectorAll<HTMLElement>('[data-path]').forEach((el) => {
+    el.textContent = path === '/' ? '/unknown' : path;
+  });
+</script>

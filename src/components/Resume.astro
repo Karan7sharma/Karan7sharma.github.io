@@ -1,0 +1,159 @@
+---
+import SectionHead from './SectionHead.astro';
+import { roles, roleCount, certs } from '../data/timeline';
+import { site } from '../data/site';
+---
+
+<section id="experience" class="block">
+  <div class="wrap reveal">
+  <SectionHead
+    prompt="git log --author=karan"
+    title="Where I've been"
+    counter={`${roleCount} roles`}
+  />
+
+  <div class="cols">
+    <ol class="timeline">
+      {
+        roles.map((r, i) => (
+          <li class="reveal-item" style={`--i:${i}`}>
+            <span class="node" aria-hidden="true" />
+            <span class="meta period">{r.period}</span>
+            <h3>{r.title}</h3>
+            <p class="org">{r.org}</p>
+            <p class="note">{r.note}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <aside class="side">
+      <article class="card">
+        <h3>Certifications</h3>
+        <ul class="certs">
+          {
+            certs.map((c) => (
+              <li>
+                <div class="cert-top">
+                  <span class="meta">{c.year}</span>
+                  {c.status === 'in-progress' && (
+                    <span class="chip">in progress</span>
+                  )}
+                </div>
+                <p class="cert-name">{c.name}</p>
+                <p class="note">{c.issuer}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </article>
+
+      <a href={site.resume} class="btn btn-ghost full">
+        Download resume <span aria-hidden="true">↓</span>
+      </a>
+    </aside>
+  </div>
+  </div>
+</section>
+
+<style>
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-l);
+  }
+
+  @media (min-width: 60rem) {
+    .cols {
+      grid-template-columns: 1.4fr 1fr;
+      gap: var(--space-xl);
+    }
+  }
+
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .timeline li {
+    position: relative;
+    padding-left: var(--space-m);
+    padding-bottom: var(--space-l);
+    border-left: 1px solid var(--line);
+  }
+  .timeline li:last-child {
+    padding-bottom: 0;
+    border-left-color: transparent;
+  }
+
+  .node {
+    position: absolute;
+    left: -4.5px;
+    top: 0.55rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+
+  .period {
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+
+  .org {
+    color: var(--accent-ink);
+    font-weight: 500;
+  }
+
+  .note {
+    color: var(--ink-soft);
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+  }
+
+  .certs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+  }
+  .certs li + li {
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-s);
+  }
+
+  .cert-top {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--accent-ink);
+    background: var(--accent-wash);
+    border-radius: var(--radius-pill);
+    padding: 0.15em 0.6em;
+  }
+
+  .cert-name {
+    font-weight: 500;
+  }
+
+  .full {
+    justify-content: center;
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+interface Props {
+  prompt: string;
+  title: string;
+  counter?: string;
+}
+const { prompt, title, counter } = Astro.props;
+---
+
+<div class="head">
+  <p class="prompt">{prompt}</p>
+  <div class="row">
+    <h2>{title}</h2>
+    {counter && <span class="meta">{counter}</span>}
+  </div>
+</div>
+
+<style>
+  .head {
+    margin-bottom: var(--space-l);
+  }
+  .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s);
+    margin-top: 0.6rem;
+  }
+</style>

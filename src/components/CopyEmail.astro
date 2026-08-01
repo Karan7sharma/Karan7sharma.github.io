@@ -1,0 +1,50 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<button
+  type="button"
+  data-copy-email={site.email}
+  class={className}
+  aria-label={`Copy email address ${site.email}`}
+>
+  <span data-label>{site.email}</span>
+  <span aria-hidden="true" class="icon">⧉</span>
+</button>
+
+<style>
+  .icon {
+    opacity: 0.55;
+  }
+  button:hover .icon {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  document
+    .querySelectorAll<HTMLButtonElement>('[data-copy-email]')
+    .forEach((btn) => {
+      const label = btn.querySelector<HTMLElement>('[data-label]');
+      const original = label?.textContent ?? '';
+
+      btn.addEventListener('click', async () => {
+        const email = btn.dataset.copyEmail ?? '';
+        try {
+          await navigator.clipboard.writeText(email);
+          if (label) label.textContent = 'copied ✓';
+        } catch {
+          window.location.href = `mailto:${email}`;
+          return;
+        }
+        setTimeout(() => {
+          if (label) label.textContent = original;
+        }, 1800);
+      });
+    });
+</script>

@@ -1,0 +1,64 @@
+---
+import CopyEmail from './CopyEmail.astro';
+import { site } from '../data/site';
+---
+
+<section id="contact" class="block">
+  <div class="wrap reveal inner">
+    <div class="glow-blob blob" aria-hidden="true"></div>
+
+    <p class="prompt">ping karan</p>
+    <h2>Let's build something reliable</h2>
+    <p class="intro">
+      Whether it's an observability gap, a pipeline that needs automating, or
+      you just want to talk infrastructure — my inbox is open.
+    </p>
+
+    <div class="actions">
+      <CopyEmail class="btn btn-primary" />
+      <a href={site.github} rel="me noopener" class="btn btn-ghost">GitHub</a>
+      <a href={site.linkedin} rel="me noopener" class="btn btn-ghost"
+        >LinkedIn</a
+      >
+    </div>
+  </div>
+</section>
+
+<style>
+  .inner {
+    position: relative;
+    max-width: 46rem;
+    text-align: center;
+  }
+
+  .blob {
+    top: -4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20rem;
+    height: 16rem;
+    background: radial-gradient(
+      closest-side,
+      rgb(52 211 153 / 0.14),
+      transparent
+    );
+  }
+
+  h2 {
+    margin-top: 0.6rem;
+  }
+
+  .intro {
+    margin: var(--space-m) auto 0;
+    max-width: 34rem;
+    color: var(--ink-soft);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+</style>

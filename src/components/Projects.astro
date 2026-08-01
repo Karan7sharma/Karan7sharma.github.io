@@ -1,0 +1,116 @@
+---
+import SectionHead from './SectionHead.astro';
+import { projects } from '../data/projects';
+---
+
+<section id="projects" class="block">
+  <div class="wrap reveal">
+    <SectionHead
+      prompt="ls projects/ --featured"
+      title="Featured projects"
+      counter={`${projects.length} shipped`}
+    />
+
+    <p class="lede">
+      Real pipelines and automation, built for production — not tutorials.
+    </p>
+
+    <div class="grid">
+      {
+        projects.map((p, i) => (
+          <article class="card reveal-item" style={`--i:${i}`}>
+            <p class="slug meta">{p.slug}</p>
+            <h3>{p.title}</h3>
+            <p class="blurb">{p.blurb}</p>
+
+            <ul class="tags">
+              {p.tags.map((t) => (
+                <li>
+                  <span class="tag">{t}</span>
+                </li>
+              ))}
+            </ul>
+
+            {p.repo && (
+              <a
+                href={p.repo}
+                rel="noopener"
+                class="repo"
+                aria-label={`View source for ${p.title}`}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.25.8-.55v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.05-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.05 1.8 2.75 1.3 3.4 1 .1-.75.4-1.3.7-1.6-2.55-.3-5.2-1.3-5.2-5.7 0-1.25.45-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.75.8 1.2 1.85 1.2 3.1 0 4.4-2.65 5.4-5.2 5.7.4.35.75 1.05.75 2.1v3.1c0 .3.2.65.8.55A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+                </svg>
+                View code <span aria-hidden="true">→</span>
+              </a>
+            )}
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .lede {
+    margin-top: calc(var(--space-l) * -1 + 0.25rem);
+    margin-bottom: var(--space-l);
+    color: var(--ink-soft);
+    max-width: 38rem;
+  }
+
+  .grid {
+    display: grid;
+    /* min() so the track can shrink below its 19rem floor on narrow phones —
+       a bare minmax(19rem, 1fr) overflows the gutters at 320px. */
+    grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr));
+    gap: var(--space-m);
+  }
+
+  .slug {
+    color: var(--ink-faint);
+  }
+
+  h3 {
+    font-size: var(--step-1);
+    line-height: 1.3;
+    transition: color var(--t-fast);
+  }
+  .card:hover h3 {
+    color: var(--accent-ink);
+  }
+
+  .blurb {
+    flex: 1;
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-xs);
+  }
+
+  .repo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: var(--space-s);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent-ink);
+    transition: gap var(--t-fast);
+  }
+  .repo:hover {
+    gap: 0.7rem;
+  }
+  .repo svg {
+    width: 1rem;
+    height: 1rem;
+  }
+</style>

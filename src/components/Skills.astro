@@ -1,0 +1,110 @@
+---
+import SectionHead from './SectionHead.astro';
+import { skillGroups, totalSkills } from '../data/skills';
+---
+
+<section id="skills" class="block">
+  <div class="wrap reveal">
+    <SectionHead
+      prompt="ls stack/"
+      title="Tech stack"
+      counter={`${totalSkills} tools`}
+    />
+
+    <p class="lede">
+      The tools I reach for to build, ship, and watch over cloud
+      infrastructure.
+    </p>
+
+    <div class="grid">
+      {
+        skillGroups.map((g, i) => (
+          <article class="card reveal-item" style={`--i:${i}`}>
+            <div class="card-top">
+              <span class="icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d={g.icon} />
+                </svg>
+              </span>
+              <h3>{g.tab}</h3>
+            </div>
+
+            <ul class="tags">
+              {g.items.map((s) => (
+                <li>
+                  <span class="tag" title={s.title}>
+                    {s.label}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .lede {
+    margin-top: calc(var(--space-l) * -1 + 0.25rem);
+    margin-bottom: var(--space-l);
+    color: var(--ink-soft);
+    max-width: 38rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-m);
+  }
+
+  @media (min-width: 44rem) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: var(--space-s);
+  }
+
+  .icon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    border-radius: var(--radius-s);
+    background: var(--accent-wash);
+    color: var(--accent-ink);
+  }
+  .icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  h3 {
+    font-size: var(--step-1);
+    line-height: 1.25;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin-top: auto;
+  }
+</style>

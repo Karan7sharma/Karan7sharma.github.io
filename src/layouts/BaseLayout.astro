@@ -1,0 +1,152 @@
+---
+// Latin subsets only — the full fontsource entrypoints pull cyrillic, greek
+// and vietnamese too, which triples the CSS for glyphs this site never uses.
+// Variable fonts for the two families that need multiple weights.
+import '@fontsource-variable/space-grotesk/index.css';
+import '@fontsource-variable/inter/standard.css';
+import '@fontsource/jetbrains-mono/latin-400.css';
+import '@fontsource/jetbrains-mono/latin-500.css';
+
+import '../styles/global.css';
+import { site } from '../data/site';
+
+const { title = site.seo.title, description = site.seo.description } =
+  Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: site.url,
+  jobTitle: site.kicker,
+  email: `mailto:${site.email}`,
+  address: { '@type': 'PostalAddress', addressLocality: site.location },
+  sameAs: [site.github, site.linkedin],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonical} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(personSchema)}
+    />
+
+    {/* No-flash theme: must run before first paint. Dark is the default —
+        only an explicit 'light' preference, or a light system setting with
+        no stored choice, flips it. */}
+    <script is:inline>
+      (function () {
+        var t = localStorage.getItem('theme');
+        if (
+          t === 'light' ||
+          (!t && matchMedia('(prefers-color-scheme: light)').matches)
+        )
+          document.documentElement.dataset.theme = 'light';
+      })();
+    </script>
+  </head>
+
+  <body>
+    {/* Targets each page's own <main id="main">, so it also works on /404
+        where there is no #about to jump to. */}
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-surface focus:px-4 focus:py-2"
+      >Skip to content</a
+    >
+    <slot />
+
+    <script>
+      // Scroll reveal — one observer for every .reveal on the page.
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const els = document.querySelectorAll<HTMLElement>('.reveal');
+
+      if (reduce) {
+        els.forEach((el) => el.classList.add('is-visible'));
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-visible');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px' },
+        );
+        els.forEach((el) => io.observe(el));
+      }
+
+      // Cursor spotlight on cards. One delegated listener rather than one
+      // per card, throttled to a frame — pointermove fires far faster than
+      // the display refreshes and each handler writes to style.
+      if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        let queued: { el: HTMLElement; x: number; y: number } | null = null;
+        let frame = 0;
+
+        const flush = () => {
+          frame = 0;
+          if (!queued) return;
+          queued.el.style.setProperty('--mx', `${queued.x}px`);
+          queued.el.style.setProperty('--my', `${queued.y}px`);
+          queued = null;
+        };
+
+        document.addEventListener(
+          'pointermove',
+          (e) => {
+            const card = (e.target as HTMLElement)?.closest?.<HTMLElement>(
+              '.card',
+            );
+            if (!card) return;
+            const r = card.getBoundingClientRect();
+            queued = {
+              el: card,
+              x: e.clientX - r.left,
+              y: e.clientY - r.top,
+            };
+            if (!frame) frame = requestAnimationFrame(flush);
+          },
+          { passive: true },
+        );
+      }
+
+      // Magnetic buttons
+      if (!reduce) {
+        document
+          .querySelectorAll<HTMLElement>('.magnetic')
+          .forEach((el) => {
+            el.addEventListener('pointermove', (e) => {
+              const r = el.getBoundingClientRect();
+              const dx = (e.clientX - r.left - r.width / 2) * 0.22;
+              const dy = (e.clientY - r.top - r.height / 2) * 0.32;
+              el.style.transform = `translate(${dx}px, ${dy}px)`;
+            });
+            el.addEventListener('pointerleave', () => {
+              el.style.transform = '';
+            });
+          });
+      }
+    </script>
+  </body>
+</html>

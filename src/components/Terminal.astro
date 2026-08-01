@@ -1,0 +1,387 @@
+---
+import { logLines } from '../data/site';
+
+// Seeded server-side so the panel is never empty before JS runs, and so
+// there's no layout shift when the stream starts.
+const seed = logLines.slice(0, 8);
+---
+
+<div class="term" data-term>
+  <!-- ─────────────────────────────────────────────────────── chrome -->
+  <div class="term-bar">
+    <div class="lights" aria-hidden="true">
+      <span style="background:#ff5f57"></span>
+      <span style="background:#febc2e"></span>
+      <span style="background:#28c840"></span>
+    </div>
+
+    <span class="term-title">observability — live tail</span>
+
+    <span class="term-status">
+      <span class="demo">demo</span>
+      <span class="dot-wrap" aria-hidden="true">
+        <span class="ping-dot"></span>
+        <span class="live-dot"></span>
+      </span>
+    </span>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── stream -->
+  <div class="term-body">
+    <ol class="stream" data-stream aria-hidden="true">
+      {
+        seed.map((l) => (
+          <li class="line" data-level={l.level ?? 'ok'}>
+            <span class="ts">--:--:--</span>
+            <span class="tag">[{l.tag}]</span>
+            <span class="msg">{l.msg}</span>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="prompt-line" aria-hidden="true">
+      <span class="arrow">➜</span><span class="cursor-block cursor"></span>
+    </p>
+  </div>
+
+  <!-- ───────────────────────────────────────────────── health strip -->
+  <div class="term-foot">
+    <div class="foot-head">
+      <span>pipeline health</span>
+      <span>last 30 days</span>
+    </div>
+    <div class="strip" data-strip role="img" aria-label="Pipeline health for the last 30 days: 28 clean days, 2 with a degradation."></div>
+  </div>
+</div>
+
+<p class="term-caption meta">s3 → vector → loki → grafana</p>
+
+<style>
+  .term {
+    background: var(--term-bg);
+    border: 1px solid var(--term-line);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    font-family: var(--font-mono);
+  }
+
+  /* ── chrome ─────────────────────────────────────────────────── */
+
+  .term-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--space-s);
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--term-line);
+    background: var(--term-raised);
+  }
+
+  .lights {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .lights span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .term-title {
+    font-size: 0.7rem;
+    color: var(--term-dim);
+    white-space: nowrap;
+  }
+
+  .term-status {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  /* Honest label — the data below is illustrative, not a real feed. */
+  .demo {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--term-dim);
+    border: 1px solid var(--term-line);
+    border-radius: var(--radius-pill);
+    padding: 0.1em 0.5em;
+  }
+
+  .dot-wrap {
+    position: relative;
+    display: inline-flex;
+    width: 8px;
+    height: 8px;
+  }
+  .ping-dot,
+  .live-dot {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--term-accent);
+  }
+  .ping-dot {
+    opacity: 0.55;
+  }
+
+  /* ── stream ─────────────────────────────────────────────────── */
+
+  .term-body {
+    padding: 1rem 1rem 0.85rem;
+  }
+
+  .stream {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    /* Fixed height so the panel never resizes as lines cycle. */
+    height: 14.5rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.42rem;
+  }
+
+  .line {
+    display: grid;
+    /* Fixed columns stop the message text jittering when the tag width
+       changes — the single biggest tell that a fake terminal is fake. */
+    grid-template-columns: 4.6rem 6.4rem 1fr;
+    gap: 0.55rem;
+    align-items: baseline;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    white-space: nowrap;
+  }
+
+  .ts {
+    color: var(--term-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tag {
+    color: var(--term-accent);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .line[data-level='warn'] .tag {
+    color: var(--term-warn);
+  }
+  .line[data-level='info'] .tag {
+    color: #7dd3fc;
+  }
+
+  .msg {
+    color: var(--term-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Newest line arrives with a small lift rather than popping in. */
+  .line.enter {
+    animation: line-in 0.34s var(--ease) both;
+  }
+  @keyframes line-in {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+  }
+
+  /* The oldest line fades out at the top instead of vanishing. */
+  .stream .line:first-child {
+    opacity: 0.42;
+  }
+  .stream .line:nth-child(2) {
+    opacity: 0.72;
+  }
+
+  .prompt-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    font-size: 0.72rem;
+    color: var(--term-accent);
+  }
+  .cursor-block {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: var(--term-accent);
+  }
+
+  /* ── health strip ───────────────────────────────────────────── */
+
+  .term-foot {
+    padding: 0.9rem 1rem 1.1rem;
+    border-top: 1px solid var(--term-line);
+  }
+
+  .foot-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.66rem;
+    color: var(--term-dim);
+    margin-bottom: 0.55rem;
+  }
+
+  .strip {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 26px;
+  }
+
+  .strip :global(span) {
+    flex: 1;
+    border-radius: 2px;
+    background: var(--term-accent);
+    opacity: 0.75;
+    transition:
+      opacity var(--t-fast),
+      transform var(--t-fast);
+  }
+  .strip :global(span[data-warn]) {
+    background: var(--term-warn);
+  }
+  .strip :global(span:hover) {
+    opacity: 1;
+    transform: scaleY(1.15);
+  }
+
+  .term-caption {
+    margin-top: 0.75rem;
+    text-align: center;
+    font-size: 0.68rem;
+  }
+
+  @media (max-width: 24rem) {
+    .line {
+      grid-template-columns: 3.9rem 5.6rem 1fr;
+      font-size: 0.66rem;
+    }
+    .term-title {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .line.enter {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { logLines } from '../data/site';
+
+  const root = document.querySelector<HTMLElement>('[data-term]');
+  const stream = root?.querySelector<HTMLElement>('[data-stream]');
+  const strip = root?.querySelector<HTMLElement>('[data-strip]');
+  if (root && stream && strip) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const MAX = 8;
+
+    /* ── health strip ────────────────────────────────────────── */
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const cell = document.createElement('span');
+      const warn = i === 20 || i === 8;
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const day = d.toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+      });
+      if (warn) cell.setAttribute('data-warn', '');
+      cell.title = warn
+        ? `${day} — degraded, 1 alert`
+        : `${day} — all green`;
+      // Slight height variation so it reads as data, not a fill pattern.
+      cell.style.height = warn ? '100%' : `${72 + ((i * 37) % 26)}%`;
+      strip.appendChild(cell);
+    }
+
+    /* ── log stream ──────────────────────────────────────────── */
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const stamp = (d: Date) =>
+      `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+
+    // Backdate the seeded lines so they carry plausible times on first paint.
+    const seeded = stream.querySelectorAll<HTMLElement>('.line .ts');
+    seeded.forEach((el, i) => {
+      const d = new Date(Date.now() - (seeded.length - i) * 1700);
+      el.textContent = stamp(d);
+    });
+
+    let idx = 8;
+
+    // Astro scopes component CSS with a data-astro-cid-* attribute stamped
+    // onto elements in the template. Nodes built with createElement don't
+    // carry it, so they'd render completely unstyled. Cloning a real line
+    // keeps the attribute on the <li> and all three spans.
+    const proto = stream.querySelector<HTMLElement>('.line')!.cloneNode(
+      true,
+    ) as HTMLElement;
+    proto.classList.remove('enter');
+
+    function push() {
+      const entry = logLines[idx % logLines.length]!;
+      idx++;
+
+      const li = proto.cloneNode(true) as HTMLElement;
+      li.classList.add('enter');
+      li.dataset.level = entry.level ?? 'ok';
+      li.querySelector<HTMLElement>('.ts')!.textContent = stamp(new Date());
+      li.querySelector<HTMLElement>('.tag')!.textContent = `[${entry.tag}]`;
+      li.querySelector<HTMLElement>('.msg')!.textContent = entry.msg;
+
+      stream!.appendChild(li);
+      while (stream!.children.length > MAX)
+        stream!.removeChild(stream!.firstChild!);
+    }
+
+    // Only run while the panel is actually on screen and the tab is visible —
+    // a setInterval that ticks forever in a background tab is exactly the
+    // sloppiness this panel is meant to advertise against.
+    let timer: number | undefined;
+    const start = () => {
+      if (reduce || timer !== undefined) return;
+      timer = window.setInterval(push, 1900);
+    };
+    const stop = () => {
+      if (timer !== undefined) {
+        clearInterval(timer);
+        timer = undefined;
+      }
+    };
+
+    // Track intersection separately: on returning to the tab the observer
+    // does NOT re-fire (the element never stopped intersecting), so without
+    // this the stream would stay frozen for good.
+    let inView = false;
+
+    const io = new IntersectionObserver(
+      ([e]) => {
+        inView = Boolean(e?.isIntersecting);
+        if (inView && !document.hidden) start();
+        else stop();
+      },
+      { threshold: 0.1 },
+    );
+    io.observe(root);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+      else if (inView) start();
+    });
+  }
+</script>

@@ -1,0 +1,69 @@
+---
+import SectionHead from './SectionHead.astro';
+import { about, highlights } from '../data/site';
+---
+
+<section id="about" class="block">
+  <div class="wrap reveal">
+    <SectionHead prompt="cat about.md" title="Reliable systems, built curiously" />
+
+    <div class="cols">
+      <div class="stack prose">
+        {about.map((p) => <p set:html={p} />)}
+      </div>
+
+      <div class="side">
+        {
+          highlights.map((h, i) => (
+            <div class="card note reveal-item" style={`--i:${i}`}>
+              <p set:html={h} />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-l);
+  }
+
+  @media (min-width: 58rem) {
+    .cols {
+      grid-template-columns: 1.35fr 1fr;
+      gap: var(--space-xl);
+    }
+  }
+
+  .prose {
+    color: var(--ink-soft);
+    max-width: var(--width-text);
+  }
+  /* Brighter white, not accent green — in the body copy <strong> names tools
+     mid-sentence, and green there would fight the highlight cards. */
+  .prose :global(strong) {
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+  }
+
+  .note {
+    padding: var(--space-s) var(--space-m);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+  .note :global(strong) {
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+</style>

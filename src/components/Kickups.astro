@@ -1,0 +1,327 @@
+---
+// The game, now its own band rather than the hero's right column.
+---
+
+<section id="kickups" class="block">
+  <div class="wrap inner reveal">
+    <div class="copy">
+      <p class="prompt">./footy-juggle --play</p>
+      <h2>One more thing</h2>
+      <p class="intro">
+        I couldn't beat my own record, so I left it here for you. Click the
+        ball to start a streak — it gets heavier the longer you last.
+      </p>
+    </div>
+
+    <div class="play">
+      <div data-kickups class="stage">
+        <div class="stage-head">
+          <span class="meta title"
+            ><span aria-hidden="true">⚽</span> footy-juggle</span
+          >
+          <span class="meta">
+            <b data-score>0</b>
+            <span class="sep" aria-hidden="true">/</span>
+            best <b data-best>0</b>
+          </span>
+        </div>
+
+        <canvas
+          data-canvas
+          tabindex="0"
+          role="application"
+          aria-label="Footy-juggle game. Click or tap the ball to keep it in the air."
+        ></canvas>
+
+        <div class="sound">
+          <button
+            data-mute
+            type="button"
+            class="sound-btn"
+            aria-label="Mute game sound"
+            aria-pressed="false"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M11 5 6 9H3v6h3l5 4V5Z" stroke-linejoin="round"></path>
+              <path class="wave-1" d="M15.5 8.5a5 5 0 0 1 0 7" stroke-linecap="round"></path>
+              <path class="wave-2" d="M18.5 6a9 9 0 0 1 0 12" stroke-linecap="round"></path>
+              <path class="cross" d="m16 9.5 5 5m0-5-5 5" stroke-linecap="round"></path>
+            </svg>
+          </button>
+
+          <input
+            data-vol
+            class="vol"
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            value="70"
+            aria-label="Game volume"
+          />
+        </div>
+
+        <p data-hint class="hint meta">
+          click the ball · space to pause · m to mute
+        </p>
+
+        <div data-over hidden class="over">
+          <div class="over-card">
+            <p class="meta dropped">dropped</p>
+            <p class="over-score" data-over-score>0</p>
+            <button data-retry type="button" class="btn btn-primary"
+              >Try again</button
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-l);
+    align-items: center;
+  }
+
+  @media (min-width: 58rem) {
+    .inner {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+      gap: var(--space-2xl);
+    }
+  }
+
+  .copy h2 {
+    margin-top: 0.5rem;
+  }
+
+  .intro {
+    margin-top: var(--space-s);
+    color: var(--ink-soft);
+  }
+
+  .stage {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow-md);
+  }
+
+  .stage-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--sunk);
+  }
+
+  .stage-head .title {
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    color: var(--accent-ink);
+  }
+
+  .stage-head b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .stage-head .sep {
+    margin-inline: 0.35em;
+    color: var(--line-strong);
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    /* pan-y, not none: taps still register as kicks, but a vertical swipe
+       that starts on the board scrolls the page instead of being swallowed. */
+    touch-action: pan-y;
+    outline: none;
+    cursor: pointer;
+  }
+
+  @media (min-width: 58rem) {
+    canvas {
+      /* Height rather than aspect-ratio, so a tall play area never grows
+         taller than the viewport on a short laptop screen. */
+      aspect-ratio: auto;
+      height: clamp(32rem, 76svh, 44rem);
+    }
+  }
+
+  .hint {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0.75rem;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  /* ─────────────────────────────────────────────── volume control ── */
+
+  .sound {
+    position: absolute;
+    right: 0.7rem;
+    bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.35rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    background: transparent;
+    transition:
+      background var(--t-fast),
+      border-color var(--t-fast);
+  }
+  .sound:hover,
+  .sound:focus-within {
+    background: var(--sunk);
+    border-color: var(--line);
+  }
+
+  .sound-btn {
+    display: grid;
+    place-items: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    color: var(--ink-faint);
+    transition: color var(--t-fast);
+  }
+  .sound-btn:hover {
+    color: var(--accent-ink);
+  }
+  .sound-btn svg {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  /* Waves show when audible, cross shows when silent. */
+  .cross {
+    display: none;
+  }
+  .sound[data-muted] .wave-1,
+  .sound[data-muted] .wave-2 {
+    display: none;
+  }
+  .sound[data-muted] .cross {
+    display: block;
+  }
+  /* At low volume the outer wave drops away — a small honest readout. */
+  .sound[data-level='low'] .wave-2 {
+    display: none;
+  }
+
+  .vol {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0;
+    opacity: 0;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--line-strong);
+    cursor: pointer;
+    transition:
+      width var(--t-norm),
+      opacity var(--t-norm);
+  }
+  .sound:hover .vol,
+  .sound:focus-within .vol {
+    width: 4.5rem;
+    opacity: 1;
+  }
+
+  .vol::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+  }
+  .vol::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+  }
+
+  /* Touch has no hover, so the slider is always out. */
+  @media (hover: none) {
+    .sound {
+      background: var(--sunk);
+      border-color: var(--line);
+    }
+    .vol {
+      width: 4rem;
+      opacity: 1;
+    }
+  }
+
+  .over {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    backdrop-filter: blur(3px);
+  }
+
+  .over-card {
+    text-align: center;
+    padding: var(--space-m) var(--space-l);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .dropped {
+    color: var(--accent-ink);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.64rem;
+  }
+
+  .over-score {
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+    margin: 0.1em 0 0.5em;
+  }
+</style>
+
+<script>
+  // Lazy-mount: the physics and render chunk only downloads once the section
+  // is near the viewport, so it never touches first paint.
+  const root = document.querySelector<HTMLElement>('[data-kickups]');
+
+  if (root) {
+    const io = new IntersectionObserver(
+      async (entries) => {
+        if (!entries[0]?.isIntersecting) return;
+        io.disconnect();
+        const { mount } = await import('../game/mount');
+        mount(root);
+      },
+      { rootMargin: '250px 0px' },
+    );
+    io.observe(root);
+  }
+</script>
