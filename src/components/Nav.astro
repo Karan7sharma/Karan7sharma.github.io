@@ -17,11 +17,9 @@ const links = [
 
 <header class="site-header">
   <nav class="wrap inner" aria-label="Main">
-    <a href="/#top" class="brand" aria-label="Back to top">
-      <span class="brand-full">karan<span class="dot">.</span>cloud</span>
-      <span class="brand-short" aria-hidden="true"
-        >k<span class="dot">.</span></span
-      >
+    <a href="/#top" class="brand" aria-label="Karan Sharma — back to top">
+      <span class="sigil" aria-hidden="true">$</span>
+      <span class="brand-name">karan</span>
     </a>
 
     <div class="right">
@@ -95,6 +93,9 @@ const links = [
   }
 
   .brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45ch;
     font-family: var(--font-mono);
     font-size: 0.9rem;
     font-weight: 600;
@@ -104,8 +105,14 @@ const links = [
   .brand:hover {
     color: var(--accent-ink);
   }
-  .dot {
+
+  /* The prompt mark, echoing the `$ cat about.md` labels down the page. */
+  .sigil {
     color: var(--accent);
+    font-weight: 500;
+  }
+  .brand:hover .sigil {
+    opacity: 0.75;
   }
 
   .right {
@@ -199,22 +206,11 @@ const links = [
     display: block;
   }
 
-  .brand-short {
-    display: none;
-  }
-
-  /* Five links plus a CTA plus a toggle don't fit a phone. Drop the CTA
-     (Contact is still reachable by scrolling) and shorten the wordmark to
-     its monogram — that alone frees ~70px, more than the overflow. */
+  /* Five links plus a CTA plus a toggle don't fit a phone. Drop the CTA —
+     Contact is still reachable by scrolling. */
   @media (max-width: 52rem) {
     .cta-item {
       display: none;
-    }
-    .brand-full {
-      display: none;
-    }
-    .brand-short {
-      display: inline;
     }
     .links {
       gap: 0.85rem;
@@ -239,10 +235,19 @@ const links = [
     }
   }
 
-  /* At ~320px even five tightened links overflow and push the theme toggle
-     off screen. Drop the one marked optional. */
-  @media (max-width: 22rem) {
+  /* On phones the wordmark is worth more than the Play link — the game is
+     still reachable by scrolling and from the footer ⚽. Dropping it buys
+     back the room `$ karan` needs. */
+  @media (max-width: 30rem) {
     .links li.optional {
+      display: none;
+    }
+  }
+
+  /* Only on the very narrowest screens does the name go, leaving the prompt
+     to stand alone. */
+  @media (max-width: 21rem) {
+    .brand-name {
       display: none;
     }
   }
